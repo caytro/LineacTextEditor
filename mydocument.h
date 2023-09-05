@@ -15,9 +15,10 @@ class MyDocument
 {
     QString initialFileName;
     QPlainTextEdit *plainTextEdit;
-    QTextDocument *textDocument;
-    bool hasFileName;
-    bool isModified;
+
+    int tabIndex;
+    bool hasFileName = false;
+    bool isModified = false;
 
 
 public:
@@ -31,9 +32,6 @@ public:
      QPlainTextEdit *getPlainTextEdit() const;
     void setPlainTextEdit(QPlainTextEdit *newPlainTextEdit);
 
-    QTextDocument *getTextDocument() const;
-    void setTextDocument(QTextDocument *newTextDocument);
-
     bool getHasFileName() const;
     void setHasFileName(bool newHasFileName);
 
@@ -45,8 +43,10 @@ public:
     void readFileContent();
     int saveToFile();
     int saveAsToFile(QString fileName);
-    int raz();
 
+
+    int getTabIndex() const;
+    void setTabIndex(int newTabIndex);
 };
 
 #endif // MYDOCUMENT_H

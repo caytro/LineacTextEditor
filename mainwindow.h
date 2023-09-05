@@ -10,6 +10,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QDebug>
+#include <QFileInfo>
 
 #include "mydocument.h"
 
@@ -30,6 +31,9 @@ public:
     MyDocument *getCurrentDocument() const;
     QString defaultDir ="~";
     void setCurrentDocument(MyDocument *newCurrentDocument);
+    int newTab(QString tabName = QString("New Tab"));
+    void majLabelCursor();
+    void majCurrentTabCaption();
 
 
 private slots:
@@ -40,11 +44,13 @@ private slots:
     void menuBarActionFileQuit();
     int plainTextEditCursorPositionChanged();
     int plainTextEditorTextChanged();
+    int tabWidgetCurrentChanged(int index);
+    void tabWidgetTabCloseRequested(int index);
 
 
 private:
     Ui::MainWindow *ui;
-    QList<MyDocument> *myDocuments;
+    QList<MyDocument*> *myDocuments;
     MyDocument *currentDocument;
 };
 #endif // MAINWINDOW_H

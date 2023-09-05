@@ -6,20 +6,22 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    while (ui->tabWidget->count()>0)ui->tabWidget->removeTab(0);
+
+    myDocuments = new QList<MyDocument*>;
+
+    //SLOTS
+
     connect(ui->actionNew, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileNew()));
     connect(ui->actionOpen, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileOpen()));
     connect(ui->actionSave, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSave()));
     connect(ui->actionSave_As, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSaveAs()));
     connect(ui->actionQuit, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileQuit()));
-    connect(ui->plainTextEdit, SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
-    connect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
+
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
 
 
-    myDocuments = new QList<MyDocument>;
-    currentDocument = new MyDocument();
-    currentDocument->setPlainTextEdit(ui->plainTextEdit);
-    myDocuments->append(*currentDocument);
-    ui->tabWidget->setTabText(0,"Document Sans Titre");
+
 }
 
 MainWindow::~MainWindow()
@@ -39,21 +41,79 @@ void MainWindow::setCurrentDocument(MyDocument *newCurrentDocument)
     currentDocument = newCurrentDocument;
 }
 
+int MainWindow::newTab(QString tabName)
+{
+    MyDocument* newDocument = new MyDocument();
+    myDocuments->append(newDocument);
+    currentDocument = newDocument;
+
+    ui->tabWidget->addTab(currentDocument->getPlainTextEdit(),tabName);
+
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
+    currentDocument->setTabIndex(ui->tabWidget->currentIndex());
+
+    currentDocument->getPlainTextEdit()->setFocus();
+    currentDocument->setIsModified(false);
+    majCurrentTabCaption();
+    connect(currentDocument->getPlainTextEdit(), SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
+    connect(currentDocument->getPlainTextEdit(), SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
+    connect(ui->tabWidget->tabBar(), SIGNAL(tabCloseRequested(int)), this, SLOT(tabWidgetTabCloseRequested(int)));
+
+
+    return 0;
+}
+
+void MainWindow::majLabelCursor()
+{
+    QTextCursor textCursor = currentDocument->getPlainTextEdit()->textCursor();
+    int lineNumber = textCursor.blockNumber();
+    int colNumber = textCursor.positionInBlock();
+
+    QString labelText("Lig : ");
+    labelText.append(QString::number(lineNumber+1));
+    labelText.append(" Col : ");
+    labelText.append(QString::number(colNumber+1));
+    ui->label->setText(labelText);
+}
+
+void MainWindow::majCurrentTabCaption()
+{
+    QString caption;
+
+    if ( currentDocument->getHasFileName()){
+        QFileInfo fi(currentDocument->getInitialFileName());
+        caption = QString(fi.fileName());
+    } else {
+        caption = QString("Document Sans Titre");
+    }
+    if (currentDocument->getIsModified()) {
+        caption.append("*");
+    }
+    ui->tabWidget->setTabText(currentDocument->getTabIndex(),caption);
+}
+
+//   SLOTS
+
+
 int MainWindow::menuBarActionFileOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
          tr("Open Text File"),
          //"/home/sylvain/ajc/formation/CPP_projet/documents",
          "",
-         tr("Text Files (*.txt *.h *.cpp)"));
+         "");
 
     qDebug() << "Filename : " << fileName ;
     if (!fileName.isEmpty())
     {
+        if (currentDocument->getIsModified() || currentDocument->getHasFileName()) {
+            newTab();
+        }
+
         currentDocument->setInitialFileName(fileName);
-        currentDocument->setPlainTextEdit(ui->plainTextEdit);
         currentDocument->readFileContent();
-        ui->tabWidget->setTabText(0,fileName);
+        currentDocument->setIsModified(false);
+        majCurrentTabCaption();
     }
 
     return 0;
@@ -63,7 +123,7 @@ int MainWindow::menuBarActionFileSave()
 {
     if (currentDocument->getHasFileName()){
         currentDocument->saveToFile();
-        ui->tabWidget->setTabText(0,currentDocument->getInitialFileName());
+        majCurrentTabCaption();
     }else{
         menuBarActionFileSaveAs();
     }
@@ -76,25 +136,21 @@ int MainWindow::menuBarActionFileSaveAs()
     QString fileName = QFileDialog::getSaveFileName(this,
          tr("Save As Text File"),
          "/home/sylvain/ajc/formation/CPP_projet/documents",
-         tr("Text Files (*.txt *.h *.cpp)"));
+         "");
     if (!fileName.isEmpty())
     {
         currentDocument->setInitialFileName(fileName);
         currentDocument->saveAsToFile(fileName);
-        ui->tabWidget->setTabText(0,fileName);
+        majCurrentTabCaption();
     }
     return 0;
 }
 
 int MainWindow::menuBarActionFileNew()
 {
-    if (currentDocument->getIsModified()){
-        qDebug() << "File New : File is Modified !";
-        return 1;
-        // demander save ?
-    }
-    currentDocument->raz();
-    ui->tabWidget->setTabText(0,"Document Sans Titre");
+    newTab();
+    currentDocument->setIsModified(false);
+    majCurrentTabCaption();
     return 0;
 }
 
@@ -106,27 +162,31 @@ void MainWindow::menuBarActionFileQuit()
 
 int MainWindow::plainTextEditCursorPositionChanged()
 {
-    QTextCursor textCursor = ui->plainTextEdit->textCursor();
-    int lineNumber = textCursor.blockNumber();
-    int colNumber = textCursor.positionInBlock();
-
-    QString labelText("Lig : ");
-    labelText.append(QString::number(lineNumber+1));
-    labelText.append(" Col : ");
-    labelText.append(QString::number(colNumber+1));
-    ui->label->setText(labelText);
-
+    majLabelCursor();
     return 0;
 }
 
 int MainWindow::plainTextEditorTextChanged()
 {
+    qDebug() << "TextChanged";
     currentDocument->setIsModified(true);
-    if (currentDocument->getHasFileName()){
-        ui->tabWidget->setTabText(0,currentDocument->getInitialFileName() + "*");
-    } else {
-        ui->tabWidget->setTabText(0,"Document Sans Titre*");
-    }
+    majCurrentTabCaption();
+    return 0;
+}
+
+int MainWindow::tabWidgetCurrentChanged(int index)
+{
+    currentDocument = myDocuments->at(index);
+    currentDocument->getPlainTextEdit()->setFocus();
+    majLabelCursor();
+    return 0;
+}
+
+void MainWindow::tabWidgetTabCloseRequested(const int index)
+{
+    qDebug() << "Close Tab " << index;
+
+    ui->tabWidget->currentWidget()->close();
 
 }
 

@@ -1,15 +1,11 @@
 #include "mydocument.h"
 
 
-
-
-
 MyDocument::MyDocument()
 {
     initialFileName = QString("");
 
     plainTextEdit = new QPlainTextEdit();
-    textDocument = new QTextDocument();
     hasFileName = false;
     isModified= false;
 
@@ -17,6 +13,15 @@ MyDocument::MyDocument()
 
 // getters and setters
 
+int MyDocument::getTabIndex() const
+{
+    return tabIndex;
+}
+
+void MyDocument::setTabIndex(int newTabIndex)
+{
+    tabIndex = newTabIndex;
+}
 bool MyDocument::getIsModified() const
 {
     return isModified;
@@ -25,6 +30,7 @@ bool MyDocument::getIsModified() const
 void MyDocument::setIsModified(bool newIsModified)
 {
     isModified = newIsModified;
+    qDebug() << "IsModified " << isModified;
 }
 
 bool MyDocument::getHasFileName() const
@@ -45,19 +51,9 @@ QPlainTextEdit *MyDocument::getPlainTextEdit() const
 void MyDocument::setPlainTextEdit(QPlainTextEdit *newPlainTextEdit)
 {
     plainTextEdit = newPlainTextEdit;
-    //plainTextEdit->setDocument(textDocument);
+
 }
 
-QTextDocument *MyDocument::getTextDocument() const
-{
-    return textDocument;
-}
-
-void MyDocument::setTextDocument(QTextDocument *newTextDocument)
-{
-    textDocument = newTextDocument;
-    //plainTextEdit->setDocument(textDocument);
-}
 
 const QString &MyDocument::getInitialFileName() const
 {
@@ -67,6 +63,7 @@ const QString &MyDocument::getInitialFileName() const
 void MyDocument::setInitialFileName(const QString &newInitialFileName)
 {
     initialFileName = newInitialFileName;
+    hasFileName = true;
 }
 
 
@@ -132,12 +129,5 @@ int MyDocument::saveAsToFile(QString fileName)
     return 0;
 }
 
-int MyDocument::raz()
-{
-    initialFileName = "";
-    hasFileName = false;
-    isModified = false;
-    plainTextEdit->setPlainText("");
-    return 0;
-}
+
 
