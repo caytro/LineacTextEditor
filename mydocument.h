@@ -28,7 +28,7 @@ public:
     const QString &getInitialFileName() const;
     void setInitialFileName(const QString &newInitialFileName);
 
-        QPlainTextEdit *getPlainTextEdit() const;
+     QPlainTextEdit *getPlainTextEdit() const;
     void setPlainTextEdit(QPlainTextEdit *newPlainTextEdit);
 
     QTextDocument *getTextDocument() const;

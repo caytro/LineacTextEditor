@@ -11,8 +11,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSave, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSave()));
     connect(ui->actionSave_As, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSaveAs()));
     connect(ui->actionQuit, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileQuit()));
+    connect(ui->plainTextEdit, SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
+    connect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
+
+
     myDocuments = new QList<MyDocument>;
     currentDocument = new MyDocument();
+    currentDocument->setPlainTextEdit(ui->plainTextEdit);
     myDocuments->append(*currentDocument);
     ui->tabWidget->setTabText(0,"Document Sans Titre");
 }
@@ -56,10 +61,12 @@ int MainWindow::menuBarActionFileOpen()
 
 int MainWindow::menuBarActionFileSave()
 {
-    if (currentDocument->getHasFileName())
+    if (currentDocument->getHasFileName()){
         currentDocument->saveToFile();
-    else
+        ui->tabWidget->setTabText(0,currentDocument->getInitialFileName());
+    }else{
         menuBarActionFileSaveAs();
+    }
     return 0;
 }
 
@@ -70,15 +77,20 @@ int MainWindow::menuBarActionFileSaveAs()
          tr("Save As Text File"),
          "/home/sylvain/ajc/formation/CPP_projet/documents",
          tr("Text Files (*.txt *.h *.cpp)"));
-    currentDocument->setInitialFileName(fileName);
-    currentDocument->saveAsToFile(fileName);
-    ui->tabWidget->setTabText(0,fileName);
+    if (!fileName.isEmpty())
+    {
+        currentDocument->setInitialFileName(fileName);
+        currentDocument->saveAsToFile(fileName);
+        ui->tabWidget->setTabText(0,fileName);
+    }
     return 0;
 }
 
 int MainWindow::menuBarActionFileNew()
 {
     if (currentDocument->getIsModified()){
+        qDebug() << "File New : File is Modified !";
+        return 1;
         // demander save ?
     }
     currentDocument->raz();
@@ -91,4 +103,32 @@ void MainWindow::menuBarActionFileQuit()
     MainWindow::close();
 
 }
+
+int MainWindow::plainTextEditCursorPositionChanged()
+{
+    QTextCursor textCursor = ui->plainTextEdit->textCursor();
+    int lineNumber = textCursor.blockNumber();
+    int colNumber = textCursor.positionInBlock();
+
+    QString labelText("Lig : ");
+    labelText.append(QString::number(lineNumber+1));
+    labelText.append(" Col : ");
+    labelText.append(QString::number(colNumber+1));
+    ui->label->setText(labelText);
+
+    return 0;
+}
+
+int MainWindow::plainTextEditorTextChanged()
+{
+    currentDocument->setIsModified(true);
+    if (currentDocument->getHasFileName()){
+        ui->tabWidget->setTabText(0,currentDocument->getInitialFileName() + "*");
+    } else {
+        ui->tabWidget->setTabText(0,"Document Sans Titre*");
+    }
+
+}
+
+
 

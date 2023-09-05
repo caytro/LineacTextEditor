@@ -138,6 +138,6 @@ int MyDocument::raz()
     hasFileName = false;
     isModified = false;
     plainTextEdit->setPlainText("");
-
+    return 0;
 }
 

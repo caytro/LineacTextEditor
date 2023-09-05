@@ -38,6 +38,8 @@ private slots:
     int menuBarActionFileSaveAs();
     int menuBarActionFileNew();
     void menuBarActionFileQuit();
+    int plainTextEditCursorPositionChanged();
+    int plainTextEditorTextChanged();
 
 
 private:
