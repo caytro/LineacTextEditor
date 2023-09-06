@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     myDocuments = new QList<MyDocument*>;
 
+
     // hide search bar
     hideSearchBar();
     newTab();
@@ -235,18 +236,39 @@ int MainWindow::tabWidgetCurrentChanged(int index)
 
 void MainWindow::tabWidgetTabCloseRequested(const int index)
 {
-    qDebug() << "Close Tab " << index;
-    debugOnglets();
+    bool suppress=true;
+    int response=QMessageBox::Discard;
 
-    if (ui->tabWidget->count()>1){
-        ui->tabWidget->removeTab(index);
-        myDocuments->removeAt(index);
-    } else {
-        myDocuments->clear();
-        ui->tabWidget->clear();
+    if (currentDocument->isModified()){
+        suppress=false;
+        QMessageBox msgBox;
+        msgBox.setText("The document has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        response = msgBox.exec();
+        if (response == QMessageBox::Cancel){
+            suppress=false;
+        }
+        else if (response == QMessageBox::Save){
+            menuBarActionFileSave();
+            suppress=true;
+        }
+        else if (response == QMessageBox::Discard){
+            suppress=true;
+        }
     }
-    qDebug() << "Après Suppression : ";
-    //debugOnglets();
+
+    if (suppress)    {
+        if (ui->tabWidget->count()>1){
+            ui->tabWidget->removeTab(index);
+            myDocuments->removeAt(index);
+        } else {
+            myDocuments->clear();
+            ui->tabWidget->clear();
+        }
+    }
+
 }
 
 void MainWindow::pushButtonCloseFindBar()

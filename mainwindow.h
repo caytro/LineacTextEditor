@@ -11,6 +11,8 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFileInfo>
+#include <QDialog>
+#include <QMessageBox>
 
 #include "mydocument.h"
 
@@ -25,6 +27,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    QMessageBox *messageBox;
 
     // getters and setters
 
