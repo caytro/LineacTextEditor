@@ -1,37 +1,29 @@
-#ifndef MYDOCUMENT_H
-#define MYDOCUMENT_H
+#ifndef MYPLAINTEXTEDIT_H
+#define MYPLAINTEXTEDIT_H
 
+#include <QPlainTextEdit>
 #include <QString>
 #include <QFile>
 #include <QList>
 #include <QDebug>
 #include <QTextDocument>
-#include <QPlainTextEdit>
 #include <QTextStream>
+#include <QMessageBox>
 
 
-
-class MyDocument
+class MyPlainTextEdit : public QPlainTextEdit
 {
     QString initialFileName;
     QString initialContent;
-    QPlainTextEdit *plainTextEdit;
-
-    int tabIndex;
     bool hasFileName = false;
 
-
-
 public:
-    MyDocument();
+    MyPlainTextEdit();
 
-    // getters ans setters
+    // getters and setters
 
     const QString &getInitialFileName() const;
     void setInitialFileName(const QString &newInitialFileName);
-
-     QPlainTextEdit *getPlainTextEdit() const;
-    void setPlainTextEdit(QPlainTextEdit *newPlainTextEdit);
 
     bool getHasFileName() const;
     void setHasFileName(bool newHasFileName);
@@ -39,7 +31,7 @@ public:
 
     // Methodes
 
-    void readFileContent();
+    int readFileContent();
     int saveToFile();
     int saveAsToFile(QString fileName);
     bool isModified();
@@ -50,4 +42,4 @@ public:
     void setTabIndex(int newTabIndex);
 };
 
-#endif // MYDOCUMENT_H
+#endif // MYPLAINTEXTEDIT_H

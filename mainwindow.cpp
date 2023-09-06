@@ -1,11 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-///
-/// \brief MainWindow::MainWindow
-/// \param parent
-/// \param a
-///
+
 MainWindow::MainWindow(QWidget *parent, QApplication *a)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -13,18 +9,17 @@ MainWindow::MainWindow(QWidget *parent, QApplication *a)
     ui->setupUi(this);
     while (ui->tabWidget->count()>0)ui->tabWidget->removeTab(0);
 
-    myDocuments = new QList<MyDocument*>;
-    application = a;
-
-
     // hide search bar
     hideSearchBar();
     newTab();
 
-    //SLOTS
+    application = a;
 
-    // main window
-    connect(application, SIGNAL(aboutToQuit()), this, SLOT(menuBarActionFileQuit()));
+    //SLOTS
+    // Application
+
+    connect(a, SIGNAL(aboutToQuit()), this, SLOT(menuBarActionFileQuit()));
+
     // Menu File
     connect(ui->actionNew, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileNew()));
     connect(ui->actionOpen, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileOpen()));
@@ -49,9 +44,7 @@ MainWindow::MainWindow(QWidget *parent, QApplication *a)
 
 
 }
-///
-/// \brief MainWindow::~MainWindow
-///
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -59,36 +52,22 @@ MainWindow::~MainWindow()
 
 // getters and setters
 
-///
-/// \brief MainWindow::getCurrentDocument
-/// \return
-///
-MyDocument *MainWindow::getCurrentDocument() const
+
+MyPlainTextEdit *MainWindow::getCurrentPlainTextEdit() const
 {
-    return currentDocument;
+    return static_cast<MyPlainTextEdit*>(ui->tabWidget->currentWidget());
 }
-///
-/// \brief MainWindow::setCurrentDocument
-/// \param newCurrentDocument
-///
-void MainWindow::setCurrentDocument(MyDocument *newCurrentDocument)
-{
-    currentDocument = newCurrentDocument;
-}
+
 
 // public methods
 
-///
-/// \brief MainWindow::hideSearchBar
-///
+
 void MainWindow::hideSearchBar()
 {
     ui->frameSearchBar->hide();
 }
 
-///
-/// \brief MainWindow::showSearchBar
-///
+
 void MainWindow::showSearchBar()
 {
     ui->frameSearchBar->show();
@@ -96,55 +75,26 @@ void MainWindow::showSearchBar()
     ui->lineEditFind->setFocus();
 }
 
-///
-/// \brief MainWindow::newTab
-/// \param tabName
-/// \return
-///
+
 int MainWindow::newTab(QString tabName)
 {
-    MyDocument* newDocument = new MyDocument();
-    myDocuments->append(newDocument);
-    currentDocument = newDocument;
-
-    ui->tabWidget->addTab(currentDocument->getPlainTextEdit(),tabName);
-
-    ui->tabWidget->setCurrentIndex(ui->tabWidget->count()-1);
-    currentDocument->setTabIndex(ui->tabWidget->currentIndex());
-
-    currentDocument->getPlainTextEdit()->setFocus();
+    MyPlainTextEdit* newMpte = new MyPlainTextEdit();
+    ui->tabWidget->addTab(newMpte,tabName);
+    ui->tabWidget->setCurrentWidget(newMpte);
+    newMpte->setFocus();
     majCurrentTabCaption();
-    connect(currentDocument->getPlainTextEdit(), SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
-    connect(currentDocument->getPlainTextEdit(), SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
+    connect(newMpte, SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
+    connect(newMpte, SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
 
     return 0;
 }
 
-///
-/// \brief MainWindow::debugOnglets
-///
-void MainWindow::debugOnglets(){
-    if(myDocuments->count()>0)
-    {
-        for (int i=0;i<ui->tabWidget->count(); i++){
-            qDebug() << "indice " << i;
-            qDebug() << "document : " << myDocuments->at(i)->getPlainTextEdit()->toPlainText();
-            ui->tabWidget->setCurrentIndex(i);
-            QPlainTextEdit* qpte =  static_cast<QPlainTextEdit*>(ui->tabWidget->currentWidget());
-            qDebug() << "tabWidget : " << qpte->toPlainText();
-        }
-    } else {
-        qDebug() << "aucun element dans myDocuments";
-    }
-}
 
 
-///
-/// \brief MainWindow::majLabelCursor
-///
+
 void MainWindow::majLabelCursor()
 {
-    QTextCursor textCursor = currentDocument->getPlainTextEdit()->textCursor();
+    QTextCursor textCursor = getCurrentPlainTextEdit()->textCursor();
     int lineNumber = textCursor.blockNumber();
     int colNumber = textCursor.positionInBlock();
 
@@ -155,32 +105,42 @@ void MainWindow::majLabelCursor()
     ui->label->setText(labelText);
 }
 
-///
-/// \brief MainWindow::majCurrentTabCaption
-///
 void MainWindow::majCurrentTabCaption()
 {
     QString caption;
 
-    if ( currentDocument->getHasFileName()){
-        QFileInfo fi(currentDocument->getInitialFileName());
+    if ( getCurrentPlainTextEdit()->getHasFileName()){
+        QFileInfo fi(getCurrentPlainTextEdit()->getInitialFileName());
         caption = QString(fi.fileName());
     } else {
         caption = QString("Document Sans Titre");
     }
-    if (currentDocument->isModified()) {
+    if (getCurrentPlainTextEdit()->isModified()) {
         caption.append("*");
     }
-    ui->tabWidget->setTabText(currentDocument->getTabIndex(),caption);
+    ui->tabWidget->setTabText(ui->tabWidget->currentIndex(),caption);
+}
+
+bool MainWindow::fileNameAlreadyOpen(QString filename)
+{
+    bool response = false;
+    if(ui->tabWidget->count() >0)
+
+    {
+        MyPlainTextEdit* mpte;
+        for (int i = 0; i<ui->tabWidget->count(); i++)
+        {
+            mpte=static_cast<MyPlainTextEdit*>(ui->tabWidget->widget(i));
+            if (mpte->getHasFileName() && (mpte->getInitialFileName() == filename)) response = true;
+        }
+    }
+    return response;
 }
 
 //   SLOTS
 
 
-///
-/// \brief MainWindow::menuBarActionFileOpen
-/// \return
-///
+
 int MainWindow::menuBarActionFileOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -189,15 +149,28 @@ int MainWindow::menuBarActionFileOpen()
          "",
          "");
 
-    qDebug() << "Filename : " << fileName ;
     if (!fileName.isEmpty())
     {
-        if (currentDocument->isModified() || currentDocument->getHasFileName()) {
+        if(fileNameAlreadyOpen(fileName)){
+            QMessageBox msgBox;
+            msgBox.setText("Le fichier " + fileName + " est déjà ouvert dans l'application");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            return 1;
+        }
+        if (ui->tabWidget->count() >0)
+        {
+            if (getCurrentPlainTextEdit()->isModified() || getCurrentPlainTextEdit()->getHasFileName()) {
+                newTab();
+            }
+        }
+        else
+        {
             newTab();
         }
-
-        currentDocument->setInitialFileName(fileName);
-        currentDocument->readFileContent();
+        MyPlainTextEdit* mPte = getCurrentPlainTextEdit();
+        mPte->setInitialFileName(fileName);
+        mPte->readFileContent();
         majCurrentTabCaption();
         QAction *myAction = new QAction(fileName);
         connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
@@ -207,14 +180,10 @@ int MainWindow::menuBarActionFileOpen()
     return 0;
 }
 
-///
-/// \brief MainWindow::menuBarActionFileSave
-/// \return
-///
 int MainWindow::menuBarActionFileSave()
 {
-    if (currentDocument->getHasFileName()){
-        currentDocument->saveToFile();
+    if (getCurrentPlainTextEdit()->getHasFileName()){
+        getCurrentPlainTextEdit()->saveToFile();
         majCurrentTabCaption();
     }else{
         menuBarActionFileSaveAs();
@@ -222,21 +191,24 @@ int MainWindow::menuBarActionFileSave()
     return 0;
 }
 
-///
-/// \brief MainWindow::menuBarActionFileSaveAs
-/// \return
-///
+
 int MainWindow::menuBarActionFileSaveAs()
 {
-    qDebug() <<"SaveAs";
     QString fileName = QFileDialog::getSaveFileName(this,
          tr("Save As Text File"),
          "",
          "");
     if (!fileName.isEmpty())
     {
-        currentDocument->setInitialFileName(fileName);
-        currentDocument->saveAsToFile(fileName);
+        if(fileNameAlreadyOpen(fileName)){
+            QMessageBox msgBox;
+            msgBox.setText("Le fichier " + fileName + " est déjà ouvert dans l'application");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            return 1;
+        }
+        getCurrentPlainTextEdit()->setInitialFileName(fileName);
+        getCurrentPlainTextEdit()->saveAsToFile(fileName);
         majCurrentTabCaption();
         QAction *myAction = new QAction(fileName);
         connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
@@ -245,10 +217,6 @@ int MainWindow::menuBarActionFileSaveAs()
     return 0;
 }
 
-///
-/// \brief MainWindow::menuBarActionFileNew
-/// \return
-///
 int MainWindow::menuBarActionFileNew()
 {
     newTab();
@@ -256,16 +224,14 @@ int MainWindow::menuBarActionFileNew()
     return 0;
 }
 
-///
-/// \brief MainWindow::menuBarActionFileQuit
-///
+
 void MainWindow::menuBarActionFileQuit()
 {
     bool unsaved=false;
-    bool close=false;
-    if (myDocuments->count() >0){
-        for (int i=0; i<myDocuments->count(); i++){
-            if (myDocuments->at(i)->isModified()) unsaved=true;
+    bool close=true;
+    if (ui->tabWidget->count() >0){
+        for (int i=0; i< ui->tabWidget->count(); i++){
+            if (static_cast<MyPlainTextEdit*>(ui->tabWidget->widget(i))->isModified()) unsaved=true;
         }
     }
     if (unsaved){
@@ -287,77 +253,64 @@ void MainWindow::menuBarActionFileQuit()
 
 }
 
-///
-/// \brief MainWindow::menuBarFileRecent
-///
+
 void MainWindow::menuBarFileRecent()
 {
     QAction *myAction = static_cast<QAction*>(sender());
     QString fileName = myAction->text();
-    if (currentDocument->isModified() || currentDocument->getHasFileName()) {
+    if(ui->tabWidget->count()>0)
+    {
+        if (getCurrentPlainTextEdit()->isModified() || getCurrentPlainTextEdit()->getHasFileName() ) {
+            newTab();
+        }
+    }
+    else
+    {
         newTab();
     }
-
-    currentDocument->setInitialFileName(fileName);
-    currentDocument->readFileContent();
+    getCurrentPlainTextEdit()->setInitialFileName(fileName);
+    getCurrentPlainTextEdit()->readFileContent();
     majCurrentTabCaption();
 }
 
-///
-/// \brief MainWindow::menuBarActionEditFind
-///
+
 void MainWindow::menuBarActionEditFind()
 {
     showSearchBar();
 }
 
-///
-/// \brief MainWindow::plainTextEditCursorPositionChanged
-/// \return
-///
+
 int MainWindow::plainTextEditCursorPositionChanged()
 {
     majLabelCursor();
     return 0;
 }
 
-///
-/// \brief MainWindow::plainTextEditorTextChanged
-/// \return
-///
+
 int MainWindow::plainTextEditorTextChanged()
 {
-    //qDebug() << "TextChanged";
     majCurrentTabCaption();
     return 0;
 }
 
-///
-/// \brief MainWindow::tabWidgetCurrentChanged
-/// \param index
-/// \return
-///
-int MainWindow::tabWidgetCurrentChanged(int index)
+
+int MainWindow::tabWidgetCurrentChanged(int )
 {
-    if(myDocuments->count()>0)
+    if(ui->tabWidget->count()>0)
     {
-        currentDocument = myDocuments->at(index);
-        currentDocument->getPlainTextEdit()->setFocus();
+        getCurrentPlainTextEdit()->setFocus();
         majLabelCursor();
     }
     return 0;
 }
 
-///
-/// \brief MainWindow::tabWidgetTabCloseRequested
-/// \param index
-///
+
 void MainWindow::tabWidgetTabCloseRequested(const int index)
 {
     bool suppress=true;
     int response=QMessageBox::Discard;
 
-    if (currentDocument->isModified()){
+    if (getCurrentPlainTextEdit()->isModified()){
         suppress=false;
         QMessageBox msgBox;
         msgBox.setText("The document has been modified.");
@@ -377,51 +330,44 @@ void MainWindow::tabWidgetTabCloseRequested(const int index)
         }
     }
 
-    if (suppress)    {
-        if (ui->tabWidget->count()>1){
+    if (suppress)
+    {
+        if (ui->tabWidget->count()>1)
+        {
             ui->tabWidget->removeTab(index);
-            myDocuments->removeAt(index);
-        } else {
-            myDocuments->clear();
+        } else
+        {
             ui->tabWidget->clear();
         }
     }
 
 }
 
-///
-/// \brief MainWindow::pushButtonCloseFindBar
-///
+
 void MainWindow::pushButtonCloseFindBar()
 {
     hideSearchBar();
 }
 
-///
-/// \brief MainWindow::pushButtonFindPrev
-///
+
 void MainWindow::pushButtonFindPrev()
 {
     QString searchedText = ui->lineEditFind->text();
-    currentDocument->getPlainTextEdit()->find(searchedText,QTextDocument::FindBackward);
+    getCurrentPlainTextEdit()->find(searchedText,QTextDocument::FindBackward);
 }
 
-///
-/// \brief MainWindow::pushButtonFindNext
-///
+
 void MainWindow::pushButtonFindNext()
 {
     QString searchedText = ui->lineEditFind->text();
 
-    currentDocument->getPlainTextEdit()->find(searchedText);
+    getCurrentPlainTextEdit()->find(searchedText);
 }
 
-///
-/// \brief MainWindow::pushButtonReplace
-///
+
 void MainWindow::pushButtonReplace()
 {
-    currentDocument->getPlainTextEdit()->textCursor().insertText(ui->lineEditReplace->text());
+    getCurrentPlainTextEdit()->textCursor().insertText(ui->lineEditReplace->text());
 
 
 }

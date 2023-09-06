@@ -11,11 +11,11 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    mydocument.cpp
+    myplaintextedit.cpp
 
 HEADERS += \
     mainwindow.h \
-    mydocument.h
+    myplaintextedit.h
 
 FORMS += \
     mainwindow.ui

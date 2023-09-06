@@ -15,7 +15,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-#include "mydocument.h"
+#include "myplaintextedit.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,76 +26,33 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    ///
-    /// \brief MainWindow
-    /// \param parent
-    /// \param a
-    ///
+
     MainWindow(QWidget *parent = nullptr, QApplication *a = nullptr);
 
 
     ~MainWindow();
 
-    ///
-    /// \brief settings
-    /// \return
-    ///
 
-    ///
-    /// \brief settings
-    /// \return
-    ///
-    QSettings settings();
-
-    ///
-    /// \brief messageBox
-    ///
-    QMessageBox *messageBox;
-
-    ///
-    /// \brief application
-    ///
-    QApplication *application;
 
     // getters and setters
-    ///
-    /// \brief getCurrentDocument
-    /// \return
-    ///
-    MyDocument *getCurrentDocument() const;
-    ///
-    /// \brief setCurrentDocument
-    /// \param newCurrentDocument
-    ///
-    void setCurrentDocument(MyDocument *newCurrentDocument);
+
+    MyPlainTextEdit *getCurrentPlainTextEdit() const;
+
 
     // public methods
-    ///
-    /// \brief hideSearchBar
-    ///
+
     void hideSearchBar();
-    ///
-    /// \brief showSearchBar
-    ///
+
     void showSearchBar();
-    ///
-    /// \brief newTab
-    /// \param tabName
-    /// \return
-    ///
+
     int newTab(QString tabName = QString("New Tab"));
-    ///
-    /// \brief majLabelCursor
-    ///
+
     void majLabelCursor();
-    ///
-    /// \brief majCurrentTabCaption
-    ///
+
     void majCurrentTabCaption();
-    ///
-    /// \brief debugOnglets
-    ///
-    void debugOnglets();
+
+    bool fileNameAlreadyOpen(QString filename);
+
 
 
 
@@ -121,8 +78,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QList<MyDocument*> *myDocuments;
-    MyDocument *currentDocument;
+    QCoreApplication *application;
+
+
 
 };
 #endif // MAINWINDOW_H
