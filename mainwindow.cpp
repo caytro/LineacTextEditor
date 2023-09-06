@@ -1,6 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+///
+/// \brief MainWindow::MainWindow
+/// \param parent
+/// \param a
+///
 MainWindow::MainWindow(QWidget *parent, QApplication *a)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -44,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent, QApplication *a)
 
 
 }
-
+///
+/// \brief MainWindow::~MainWindow
+///
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -52,11 +59,18 @@ MainWindow::~MainWindow()
 
 // getters and setters
 
+///
+/// \brief MainWindow::getCurrentDocument
+/// \return
+///
 MyDocument *MainWindow::getCurrentDocument() const
 {
     return currentDocument;
 }
-
+///
+/// \brief MainWindow::setCurrentDocument
+/// \param newCurrentDocument
+///
 void MainWindow::setCurrentDocument(MyDocument *newCurrentDocument)
 {
     currentDocument = newCurrentDocument;
@@ -64,12 +78,17 @@ void MainWindow::setCurrentDocument(MyDocument *newCurrentDocument)
 
 // public methods
 
-
+///
+/// \brief MainWindow::hideSearchBar
+///
 void MainWindow::hideSearchBar()
 {
     ui->frameSearchBar->hide();
 }
 
+///
+/// \brief MainWindow::showSearchBar
+///
 void MainWindow::showSearchBar()
 {
     ui->frameSearchBar->show();
@@ -77,6 +96,11 @@ void MainWindow::showSearchBar()
     ui->lineEditFind->setFocus();
 }
 
+///
+/// \brief MainWindow::newTab
+/// \param tabName
+/// \return
+///
 int MainWindow::newTab(QString tabName)
 {
     MyDocument* newDocument = new MyDocument();
@@ -93,11 +117,12 @@ int MainWindow::newTab(QString tabName)
     connect(currentDocument->getPlainTextEdit(), SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
     connect(currentDocument->getPlainTextEdit(), SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
 
-
-
     return 0;
 }
 
+///
+/// \brief MainWindow::debugOnglets
+///
 void MainWindow::debugOnglets(){
     if(myDocuments->count()>0)
     {
@@ -114,7 +139,9 @@ void MainWindow::debugOnglets(){
 }
 
 
-
+///
+/// \brief MainWindow::majLabelCursor
+///
 void MainWindow::majLabelCursor()
 {
     QTextCursor textCursor = currentDocument->getPlainTextEdit()->textCursor();
@@ -128,6 +155,9 @@ void MainWindow::majLabelCursor()
     ui->label->setText(labelText);
 }
 
+///
+/// \brief MainWindow::majCurrentTabCaption
+///
 void MainWindow::majCurrentTabCaption()
 {
     QString caption;
@@ -147,6 +177,10 @@ void MainWindow::majCurrentTabCaption()
 //   SLOTS
 
 
+///
+/// \brief MainWindow::menuBarActionFileOpen
+/// \return
+///
 int MainWindow::menuBarActionFileOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -173,6 +207,10 @@ int MainWindow::menuBarActionFileOpen()
     return 0;
 }
 
+///
+/// \brief MainWindow::menuBarActionFileSave
+/// \return
+///
 int MainWindow::menuBarActionFileSave()
 {
     if (currentDocument->getHasFileName()){
@@ -184,6 +222,10 @@ int MainWindow::menuBarActionFileSave()
     return 0;
 }
 
+///
+/// \brief MainWindow::menuBarActionFileSaveAs
+/// \return
+///
 int MainWindow::menuBarActionFileSaveAs()
 {
     qDebug() <<"SaveAs";
@@ -203,6 +245,10 @@ int MainWindow::menuBarActionFileSaveAs()
     return 0;
 }
 
+///
+/// \brief MainWindow::menuBarActionFileNew
+/// \return
+///
 int MainWindow::menuBarActionFileNew()
 {
     newTab();
@@ -210,6 +256,9 @@ int MainWindow::menuBarActionFileNew()
     return 0;
 }
 
+///
+/// \brief MainWindow::menuBarActionFileQuit
+///
 void MainWindow::menuBarActionFileQuit()
 {
     bool unsaved=false;
@@ -238,6 +287,9 @@ void MainWindow::menuBarActionFileQuit()
 
 }
 
+///
+/// \brief MainWindow::menuBarFileRecent
+///
 void MainWindow::menuBarFileRecent()
 {
     QAction *myAction = static_cast<QAction*>(sender());
@@ -251,17 +303,28 @@ void MainWindow::menuBarFileRecent()
     majCurrentTabCaption();
 }
 
+///
+/// \brief MainWindow::menuBarActionEditFind
+///
 void MainWindow::menuBarActionEditFind()
 {
     showSearchBar();
 }
 
+///
+/// \brief MainWindow::plainTextEditCursorPositionChanged
+/// \return
+///
 int MainWindow::plainTextEditCursorPositionChanged()
 {
     majLabelCursor();
     return 0;
 }
 
+///
+/// \brief MainWindow::plainTextEditorTextChanged
+/// \return
+///
 int MainWindow::plainTextEditorTextChanged()
 {
     //qDebug() << "TextChanged";
@@ -269,6 +332,11 @@ int MainWindow::plainTextEditorTextChanged()
     return 0;
 }
 
+///
+/// \brief MainWindow::tabWidgetCurrentChanged
+/// \param index
+/// \return
+///
 int MainWindow::tabWidgetCurrentChanged(int index)
 {
     if(myDocuments->count()>0)
@@ -280,7 +348,10 @@ int MainWindow::tabWidgetCurrentChanged(int index)
     return 0;
 }
 
-
+///
+/// \brief MainWindow::tabWidgetTabCloseRequested
+/// \param index
+///
 void MainWindow::tabWidgetTabCloseRequested(const int index)
 {
     bool suppress=true;
@@ -318,17 +389,26 @@ void MainWindow::tabWidgetTabCloseRequested(const int index)
 
 }
 
+///
+/// \brief MainWindow::pushButtonCloseFindBar
+///
 void MainWindow::pushButtonCloseFindBar()
 {
     hideSearchBar();
 }
 
+///
+/// \brief MainWindow::pushButtonFindPrev
+///
 void MainWindow::pushButtonFindPrev()
 {
     QString searchedText = ui->lineEditFind->text();
     currentDocument->getPlainTextEdit()->find(searchedText,QTextDocument::FindBackward);
 }
 
+///
+/// \brief MainWindow::pushButtonFindNext
+///
 void MainWindow::pushButtonFindNext()
 {
     QString searchedText = ui->lineEditFind->text();
@@ -336,7 +416,9 @@ void MainWindow::pushButtonFindNext()
     currentDocument->getPlainTextEdit()->find(searchedText);
 }
 
-
+///
+/// \brief MainWindow::pushButtonReplace
+///
 void MainWindow::pushButtonReplace()
 {
     currentDocument->getPlainTextEdit()->textCursor().insertText(ui->lineEditReplace->text());

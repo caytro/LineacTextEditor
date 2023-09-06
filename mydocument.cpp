@@ -1,6 +1,8 @@
 #include "mydocument.h"
 
-
+///
+/// \brief MyDocument::MyDocument
+///
 MyDocument::MyDocument()
 {
     initialFileName = QString("");
@@ -13,26 +15,46 @@ MyDocument::MyDocument()
 
 // getters and setters
 
+///
+/// \brief MyDocument::getTabIndex
+/// \return
+///
 int MyDocument::getTabIndex() const
 {
     return tabIndex;
 }
 
+///
+/// \brief MyDocument::setTabIndex
+/// \param newTabIndex
+///
 void MyDocument::setTabIndex(int newTabIndex)
 {
     tabIndex = newTabIndex;
 }
 
+///
+/// \brief MyDocument::getHasFileName
+/// \return
+///
 bool MyDocument::getHasFileName() const
 {
     return hasFileName;
 }
 
+///
+/// \brief MyDocument::setHasFileName
+/// \param newHasFileName
+///
 void MyDocument::setHasFileName(bool newHasFileName)
 {
     hasFileName = newHasFileName;
 }
 
+///
+/// \brief MyDocument::getPlainTextEdit
+/// \return
+///
 QPlainTextEdit *MyDocument::getPlainTextEdit() const
 {
     return plainTextEdit;
@@ -44,12 +66,19 @@ void MyDocument::setPlainTextEdit(QPlainTextEdit *newPlainTextEdit)
 
 }
 
-
+///
+/// \brief MyDocument::getInitialFileName
+/// \return
+///
 const QString &MyDocument::getInitialFileName() const
 {
     return initialFileName;
 }
 
+///
+/// \brief MyDocument::setInitialFileName
+/// \param newInitialFileName
+///
 void MyDocument::setInitialFileName(const QString &newInitialFileName)
 {
     initialFileName = newInitialFileName;
@@ -60,10 +89,9 @@ void MyDocument::setInitialFileName(const QString &newInitialFileName)
 
 // Public methods
 
-/**
- * @brief MyDocument::readFileContent
- */
-
+///
+/// \brief MyDocument::readFileContent
+///
 void MyDocument::readFileContent()
 {
     QFile file(getInitialFileName());
@@ -87,7 +115,10 @@ void MyDocument::readFileContent()
 
 }
 
-
+///
+/// \brief MyDocument::saveToFile
+/// \return
+///
 int MyDocument::saveToFile()
 {
     QFile file(getInitialFileName());
@@ -104,6 +135,11 @@ int MyDocument::saveToFile()
 
 }
 
+///
+/// \brief MyDocument::saveAsToFile
+/// \param fileName
+/// \return
+///
 int MyDocument::saveAsToFile(QString fileName)
 {
     setInitialFileName(fileName);
@@ -121,6 +157,10 @@ int MyDocument::saveAsToFile(QString fileName)
     return 0;
 }
 
+///
+/// \brief MyDocument::isModified
+/// \return
+///
 bool MyDocument::isModified()
 {
     return (getPlainTextEdit()->toPlainText() != initialContent);
