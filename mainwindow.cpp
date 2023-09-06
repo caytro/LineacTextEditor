@@ -186,8 +186,7 @@ void MainWindow::tabWidgetTabCloseRequested(const int index)
 {
     qDebug() << "Close Tab " << index;
 
-    ui->tabWidget->currentWidget()->close();
-
+    ui->tabWidget->removeTab(index);
 }
 
 
