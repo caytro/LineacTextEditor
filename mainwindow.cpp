@@ -16,6 +16,11 @@ MainWindow::MainWindow(QWidget *parent)
     newTab();
 
     //SLOTS
+
+    // main window
+
+
+
     // Menu File
     connect(ui->actionNew, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileNew()));
     connect(ui->actionOpen, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileOpen()));
@@ -109,6 +114,34 @@ void MainWindow::debugOnglets(){
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    bool unsaved=false;
+    bool close=false;
+    if (myDocuments->count() >0){
+        for (int i=0; i<myDocuments->count(); i++){
+            if (myDocuments->at(i)->isModified()) unsaved=true;
+        }
+    }
+    if (unsaved){
+        QMessageBox msgBox;
+        msgBox.setText("Somme documents have been modified.");
+        msgBox.setInformativeText("Do you really want to quit?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No );
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int response = msgBox.exec();
+        if (response == QMessageBox::No){
+            close=false;
+        }
+        else {
+            close=true;
+        }
+
+    }
+    if (close) QMainWindow::closeEvent(event);
+
+}
+
 void MainWindow::majLabelCursor()
 {
     QTextCursor textCursor = currentDocument->getPlainTextEdit()->textCursor();
@@ -200,7 +233,29 @@ int MainWindow::menuBarActionFileNew()
 
 void MainWindow::menuBarActionFileQuit()
 {
-    MainWindow::close();
+    bool unsaved=false;
+    bool close=false;
+    if (myDocuments->count() >0){
+        for (int i=0; i<myDocuments->count(); i++){
+            if (myDocuments->at(i)->isModified()) unsaved=true;
+        }
+    }
+    if (unsaved){
+        QMessageBox msgBox;
+        msgBox.setText("Somme documents have been modified.");
+        msgBox.setInformativeText("Do you really want to quit?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No );
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int response = msgBox.exec();
+        if (response == QMessageBox::No){
+            close=false;
+        }
+        else {
+            close=true;
+        }
+
+    }
+    if (close) MainWindow::close();
 
 }
 

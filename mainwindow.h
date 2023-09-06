@@ -13,6 +13,7 @@
 #include <QFileInfo>
 #include <QDialog>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include "mydocument.h"
 
@@ -43,6 +44,7 @@ public:
     void majLabelCursor();
     void majCurrentTabCaption();
     void debugOnglets();
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     int menuBarActionFileOpen();
