@@ -34,7 +34,7 @@ public:
     int newTab(QString tabName = QString("New Tab"));
     void majLabelCursor();
     void majCurrentTabCaption();
-
+    void debugOnglets();
 
 private slots:
     int menuBarActionFileOpen();

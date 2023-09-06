@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSave, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSave()));
     connect(ui->actionSave_As, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSaveAs()));
     connect(ui->actionQuit, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileQuit()));
-
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabWidgetTabCloseRequested(int)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
 
 
@@ -57,10 +57,25 @@ int MainWindow::newTab(QString tabName)
     majCurrentTabCaption();
     connect(currentDocument->getPlainTextEdit(), SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
     connect(currentDocument->getPlainTextEdit(), SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
-    connect(ui->tabWidget->tabBar(), SIGNAL(tabCloseRequested(int)), this, SLOT(tabWidgetTabCloseRequested(int)));
+
 
 
     return 0;
+}
+
+void MainWindow::debugOnglets(){
+    if(myDocuments->count()>0)
+    {
+        for (int i=0;i<ui->tabWidget->count(); i++){
+            qDebug() << "indice " << i;
+            qDebug() << "document : " << myDocuments->at(i)->getPlainTextEdit()->toPlainText();
+            ui->tabWidget->setCurrentIndex(i);
+            QPlainTextEdit* qpte =  static_cast<QPlainTextEdit*>(ui->tabWidget->currentWidget());
+            qDebug() << "tabWidget : " << qpte->toPlainText();
+        }
+    } else {
+        qDebug() << "aucun element dans myDocuments";
+    }
 }
 
 void MainWindow::majLabelCursor()
@@ -176,17 +191,30 @@ int MainWindow::plainTextEditorTextChanged()
 
 int MainWindow::tabWidgetCurrentChanged(int index)
 {
-    currentDocument = myDocuments->at(index);
-    currentDocument->getPlainTextEdit()->setFocus();
-    majLabelCursor();
+    if(myDocuments->count()>0)
+    {
+        currentDocument = myDocuments->at(index);
+        currentDocument->getPlainTextEdit()->setFocus();
+        majLabelCursor();
+    }
     return 0;
 }
+
 
 void MainWindow::tabWidgetTabCloseRequested(const int index)
 {
     qDebug() << "Close Tab " << index;
+    debugOnglets();
 
-    ui->tabWidget->removeTab(index);
+    if (ui->tabWidget->count()>1){
+        ui->tabWidget->removeTab(index);
+        myDocuments->removeAt(index);
+    } else {
+        myDocuments->clear();
+        ui->tabWidget->clear();
+    }
+    qDebug() << "Après Suppression : ";
+    //debugOnglets();
 }
 
 
