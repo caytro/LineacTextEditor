@@ -7,7 +7,7 @@ MyDocument::MyDocument()
 
     plainTextEdit = new QPlainTextEdit();
     hasFileName = false;
-    isModified= false;
+    initialContent= QString("");
 
 }
 
@@ -21,16 +21,6 @@ int MyDocument::getTabIndex() const
 void MyDocument::setTabIndex(int newTabIndex)
 {
     tabIndex = newTabIndex;
-}
-bool MyDocument::getIsModified() const
-{
-    return isModified;
-}
-
-void MyDocument::setIsModified(bool newIsModified)
-{
-    isModified = newIsModified;
-    qDebug() << "IsModified " << isModified;
 }
 
 bool MyDocument::getHasFileName() const
@@ -88,9 +78,9 @@ void MyDocument::readFileContent()
             textContent.append(QString(line));
         }
         qDebug() << "readFileContent : textContent " << textContent;
-        isModified = false;
         hasFileName=true;
         plainTextEdit->setPlainText(textContent);
+        initialContent = textContent;
     } else {
         qDebug() << "Fail open " << initialFileName;
     }
@@ -106,9 +96,10 @@ int MyDocument::saveToFile()
     {
         QTextStream textStream(&file);
         textStream << plainTextEdit->toPlainText();
-        qDebug() << "Save : plainTextEdit->toPlainText()" << plainTextEdit->toPlainText();
+        initialContent = plainTextEdit->toPlainText();
+        //qDebug() << "Save : plainTextEdit->toPlainText()" << plainTextEdit->toPlainText();
     }
-    isModified=false;
+
     return 0;
 
 }
@@ -123,10 +114,16 @@ int MyDocument::saveAsToFile(QString fileName)
     {
         QTextStream textStream(&file);
         textStream << plainTextEdit->toPlainText();
-        qDebug() << "Save : plainTextEdit->toPlainText()" << plainTextEdit->toPlainText();
+        initialContent = plainTextEdit->toPlainText();
+        // qDebug() << "Save : plainTextEdit->toPlainText()" << plainTextEdit->toPlainText();
     }
-    isModified=false;
+
     return 0;
+}
+
+bool MyDocument::isModified()
+{
+    return (getPlainTextEdit()->toPlainText() != initialContent);
 }
 
 

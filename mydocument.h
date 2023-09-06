@@ -14,11 +14,12 @@
 class MyDocument
 {
     QString initialFileName;
+    QString initialContent;
     QPlainTextEdit *plainTextEdit;
 
     int tabIndex;
     bool hasFileName = false;
-    bool isModified = false;
+
 
 
 public:
@@ -35,14 +36,14 @@ public:
     bool getHasFileName() const;
     void setHasFileName(bool newHasFileName);
 
-    bool getIsModified() const;
-    void setIsModified(bool newIsModified);
 
     // Methodes
 
     void readFileContent();
     int saveToFile();
     int saveAsToFile(QString fileName);
+    bool isModified();
+    void setInitialContent(QString s);
 
 
     int getTabIndex() const;

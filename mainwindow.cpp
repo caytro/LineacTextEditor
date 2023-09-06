@@ -84,7 +84,6 @@ int MainWindow::newTab(QString tabName)
     currentDocument->setTabIndex(ui->tabWidget->currentIndex());
 
     currentDocument->getPlainTextEdit()->setFocus();
-    currentDocument->setIsModified(false);
     majCurrentTabCaption();
     connect(currentDocument->getPlainTextEdit(), SIGNAL(cursorPositionChanged()), this, SLOT(plainTextEditCursorPositionChanged()));
     connect(currentDocument->getPlainTextEdit(), SIGNAL(textChanged()), this, SLOT(plainTextEditorTextChanged()));
@@ -132,7 +131,7 @@ void MainWindow::majCurrentTabCaption()
     } else {
         caption = QString("Document Sans Titre");
     }
-    if (currentDocument->getIsModified()) {
+    if (currentDocument->isModified()) {
         caption.append("*");
     }
     ui->tabWidget->setTabText(currentDocument->getTabIndex(),caption);
@@ -152,13 +151,12 @@ int MainWindow::menuBarActionFileOpen()
     qDebug() << "Filename : " << fileName ;
     if (!fileName.isEmpty())
     {
-        if (currentDocument->getIsModified() || currentDocument->getHasFileName()) {
+        if (currentDocument->isModified() || currentDocument->getHasFileName()) {
             newTab();
         }
 
         currentDocument->setInitialFileName(fileName);
         currentDocument->readFileContent();
-        currentDocument->setIsModified(false);
         majCurrentTabCaption();
     }
 
@@ -181,7 +179,7 @@ int MainWindow::menuBarActionFileSaveAs()
     qDebug() <<"SaveAs";
     QString fileName = QFileDialog::getSaveFileName(this,
          tr("Save As Text File"),
-         "/home/sylvain/ajc/formation/CPP_projet/documents",
+         "",
          "");
     if (!fileName.isEmpty())
     {
@@ -195,7 +193,6 @@ int MainWindow::menuBarActionFileSaveAs()
 int MainWindow::menuBarActionFileNew()
 {
     newTab();
-    currentDocument->setIsModified(false);
     majCurrentTabCaption();
     return 0;
 }
@@ -219,8 +216,7 @@ int MainWindow::plainTextEditCursorPositionChanged()
 
 int MainWindow::plainTextEditorTextChanged()
 {
-    qDebug() << "TextChanged";
-    currentDocument->setIsModified(true);
+    //qDebug() << "TextChanged";
     majCurrentTabCaption();
     return 0;
 }
