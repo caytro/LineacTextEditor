@@ -57,6 +57,7 @@ private slots:
     void pushButtonCloseFindBar();
     void pushButtonFindNext();
     void pushButtonFindPrev();
+    void pushButtonReplace();
 
 
 private:

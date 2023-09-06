@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // hide search bar
     hideSearchBar();
-
+    newTab();
 
     //SLOTS
     // Menu File
@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButtonCloseFindBar, SIGNAL(clicked()), this, SLOT(pushButtonCloseFindBar()));
     connect(ui->pushButtonFindNext, SIGNAL(clicked()), this, SLOT(pushButtonFindNext()));
     connect(ui->pushButtonFindPrev, SIGNAL(clicked()), this, SLOT(pushButtonFindPrev()));
+    connect(ui->pushButtonReplace, SIGNAL(clicked()), this, SLOT(pushButtonReplace()));
 
 
 
@@ -67,8 +68,7 @@ void MainWindow::hideSearchBar()
 void MainWindow::showSearchBar()
 {
     ui->frameSearchBar->show();
-    ui->lineEditReplace->hide();
-    ui->labelReplace->hide();
+
     ui->lineEditFind->setFocus();
 }
 
@@ -263,8 +263,15 @@ void MainWindow::pushButtonFindPrev()
 void MainWindow::pushButtonFindNext()
 {
     QString searchedText = ui->lineEditFind->text();
+
     currentDocument->getPlainTextEdit()->find(searchedText);
-    //qDebug() << "Find " << searchedText;
+}
+
+
+void MainWindow::pushButtonReplace()
+{
+    currentDocument->getPlainTextEdit()->textCursor().insertText(ui->lineEditReplace->text());
+
 
 }
 

@@ -97,7 +97,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>152</width>
+             <width>106</width>
              <height>20</height>
             </size>
            </property>
@@ -116,7 +116,7 @@
          <item>
           <widget class="QLabel" name="labelReplace">
            <property name="text">
-            <string>Replace</string>
+            <string>Replace with</string>
            </property>
           </widget>
          </item>
@@ -134,6 +134,13 @@
           <widget class="QPushButton" name="pushButtonFindPrev">
            <property name="text">
             <string>Find Prev</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonReplace">
+           <property name="text">
+            <string>Replace</string>
            </property>
           </widget>
          </item>
