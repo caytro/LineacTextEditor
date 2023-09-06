@@ -29,8 +29,12 @@ public:
     // getters and setters
 
     MyDocument *getCurrentDocument() const;
-    QString defaultDir ="~";
     void setCurrentDocument(MyDocument *newCurrentDocument);
+
+    // public methods
+
+    void hideSearchBar();
+    void showSearchBar();
     int newTab(QString tabName = QString("New Tab"));
     void majLabelCursor();
     void majCurrentTabCaption();
@@ -42,10 +46,17 @@ private slots:
     int menuBarActionFileSaveAs();
     int menuBarActionFileNew();
     void menuBarActionFileQuit();
+
+    void menuBarActionEditFind();
+
     int plainTextEditCursorPositionChanged();
     int plainTextEditorTextChanged();
     int tabWidgetCurrentChanged(int index);
     void tabWidgetTabCloseRequested(int index);
+
+    void pushButtonCloseFindBar();
+    void pushButtonFindNext();
+    void pushButtonFindPrev();
 
 
 private:

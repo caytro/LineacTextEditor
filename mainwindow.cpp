@@ -10,15 +10,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     myDocuments = new QList<MyDocument*>;
 
-    //SLOTS
+    // hide search bar
+    hideSearchBar();
 
+
+    //SLOTS
+    // Menu File
     connect(ui->actionNew, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileNew()));
     connect(ui->actionOpen, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileOpen()));
     connect(ui->actionSave, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSave()));
     connect(ui->actionSave_As, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileSaveAs()));
     connect(ui->actionQuit, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileQuit()));
+
+    // Menu Edit
+    connect(ui->actionFind, SIGNAL(triggered(bool )), this, SLOT(menuBarActionEditFind()));
+
+    // tabWidgets
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabWidgetTabCloseRequested(int)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
+
+    // searchBar
+    connect(ui->pushButtonCloseFindBar, SIGNAL(clicked()), this, SLOT(pushButtonCloseFindBar()));
+    connect(ui->pushButtonFindNext, SIGNAL(clicked()), this, SLOT(pushButtonFindNext()));
+    connect(ui->pushButtonFindPrev, SIGNAL(clicked()), this, SLOT(pushButtonFindPrev()));
+
 
 
 
@@ -39,6 +54,22 @@ MyDocument *MainWindow::getCurrentDocument() const
 void MainWindow::setCurrentDocument(MyDocument *newCurrentDocument)
 {
     currentDocument = newCurrentDocument;
+}
+
+// public methods
+
+
+void MainWindow::hideSearchBar()
+{
+    ui->frameSearchBar->hide();
+}
+
+void MainWindow::showSearchBar()
+{
+    ui->frameSearchBar->show();
+    ui->lineEditReplace->hide();
+    ui->labelReplace->hide();
+    ui->lineEditFind->setFocus();
 }
 
 int MainWindow::newTab(QString tabName)
@@ -175,6 +206,11 @@ void MainWindow::menuBarActionFileQuit()
 
 }
 
+void MainWindow::menuBarActionEditFind()
+{
+    showSearchBar();
+}
+
 int MainWindow::plainTextEditCursorPositionChanged()
 {
     majLabelCursor();
@@ -215,6 +251,25 @@ void MainWindow::tabWidgetTabCloseRequested(const int index)
     }
     qDebug() << "Après Suppression : ";
     //debugOnglets();
+}
+
+void MainWindow::pushButtonCloseFindBar()
+{
+    hideSearchBar();
+}
+
+void MainWindow::pushButtonFindPrev()
+{
+    QString searchedText = ui->lineEditFind->text();
+    currentDocument->getPlainTextEdit()->find(searchedText,QTextDocument::FindBackward);
+}
+
+void MainWindow::pushButtonFindNext()
+{
+    QString searchedText = ui->lineEditFind->text();
+    currentDocument->getPlainTextEdit()->find(searchedText);
+    //qDebug() << "Find " << searchedText;
+
 }
 
 
