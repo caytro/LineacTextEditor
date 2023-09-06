@@ -26,11 +26,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr, QApplication *a = nullptr);
     ~MainWindow();
-
+    QSettings settings();
     QMessageBox *messageBox;
-
+    QApplication *application;
     // getters and setters
 
     MyDocument *getCurrentDocument() const;
@@ -44,7 +44,8 @@ public:
     void majLabelCursor();
     void majCurrentTabCaption();
     void debugOnglets();
-    void closeEvent(QCloseEvent *event);
+
+
 
 private slots:
     int menuBarActionFileOpen();
@@ -52,7 +53,7 @@ private slots:
     int menuBarActionFileSaveAs();
     int menuBarActionFileNew();
     void menuBarActionFileQuit();
-
+    void menuBarFileRecent();
     void menuBarActionEditFind();
 
     int plainTextEditCursorPositionChanged();
@@ -70,5 +71,6 @@ private:
     Ui::MainWindow *ui;
     QList<MyDocument*> *myDocuments;
     MyDocument *currentDocument;
+
 };
 #endif // MAINWINDOW_H

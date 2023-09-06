@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, QApplication *a)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     while (ui->tabWidget->count()>0)ui->tabWidget->removeTab(0);
 
     myDocuments = new QList<MyDocument*>;
+    application = a;
 
 
     // hide search bar
@@ -18,9 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     //SLOTS
 
     // main window
-
-
-
+    connect(application, SIGNAL(aboutToQuit()), this, SLOT(menuBarActionFileQuit()));
     // Menu File
     connect(ui->actionNew, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileNew()));
     connect(ui->actionOpen, SIGNAL(triggered(bool )), this, SLOT(menuBarActionFileOpen()));
@@ -114,33 +113,7 @@ void MainWindow::debugOnglets(){
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    bool unsaved=false;
-    bool close=false;
-    if (myDocuments->count() >0){
-        for (int i=0; i<myDocuments->count(); i++){
-            if (myDocuments->at(i)->isModified()) unsaved=true;
-        }
-    }
-    if (unsaved){
-        QMessageBox msgBox;
-        msgBox.setText("Somme documents have been modified.");
-        msgBox.setInformativeText("Do you really want to quit?");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No );
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int response = msgBox.exec();
-        if (response == QMessageBox::No){
-            close=false;
-        }
-        else {
-            close=true;
-        }
 
-    }
-    if (close) QMainWindow::closeEvent(event);
-
-}
 
 void MainWindow::majLabelCursor()
 {
@@ -192,6 +165,9 @@ int MainWindow::menuBarActionFileOpen()
         currentDocument->setInitialFileName(fileName);
         currentDocument->readFileContent();
         majCurrentTabCaption();
+        QAction *myAction = new QAction(fileName);
+        connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
+        ui->menuRecent->addAction(myAction);
     }
 
     return 0;
@@ -220,6 +196,9 @@ int MainWindow::menuBarActionFileSaveAs()
         currentDocument->setInitialFileName(fileName);
         currentDocument->saveAsToFile(fileName);
         majCurrentTabCaption();
+        QAction *myAction = new QAction(fileName);
+        connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
+        ui->menuRecent->addAction(myAction);
     }
     return 0;
 }
@@ -257,6 +236,19 @@ void MainWindow::menuBarActionFileQuit()
     }
     if (close) MainWindow::close();
 
+}
+
+void MainWindow::menuBarFileRecent()
+{
+    QAction *myAction = static_cast<QAction*>(sender());
+    QString fileName = myAction->text();
+    if (currentDocument->isModified() || currentDocument->getHasFileName()) {
+        newTab();
+    }
+
+    currentDocument->setInitialFileName(fileName);
+    currentDocument->readFileContent();
+    majCurrentTabCaption();
 }
 
 void MainWindow::menuBarActionEditFind()

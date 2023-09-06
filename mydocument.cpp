@@ -68,21 +68,21 @@ void MyDocument::readFileContent()
 {
     QFile file(getInitialFileName());
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        qDebug() << "readFileContent : initialFileName " << getInitialFileName();
-        qDebug() << "file " << file.exists();
+        //qDebug() << "readFileContent : initialFileName " << getInitialFileName();
+        //qDebug() << "file " << file.exists();
         int cptLine = 0;
         QString textContent("");
         while (!file.atEnd()) {
             QByteArray line = file.readLine();
-            qDebug() << "Ligne " << ++cptLine << line;
+            //qDebug() << "Ligne " << ++cptLine << line;
             textContent.append(QString(line));
         }
-        qDebug() << "readFileContent : textContent " << textContent;
+        //qDebug() << "readFileContent : textContent " << textContent;
         hasFileName=true;
         plainTextEdit->setPlainText(textContent);
         initialContent = textContent;
     } else {
-        qDebug() << "Fail open " << initialFileName;
+        //qDebug() << "Fail open " << initialFileName;
     }
 
 }
