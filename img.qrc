@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/photo">
+        <file>ressources/DIABLE001.jpg</file>
+        <file>ressources/fermer.png</file>
+    </qresource>
+</RCC>

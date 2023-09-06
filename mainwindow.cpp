@@ -40,7 +40,13 @@ MainWindow::MainWindow(QWidget *parent, QApplication *a)
     connect(ui->pushButtonFindPrev, SIGNAL(clicked()), this, SLOT(pushButtonFindPrev()));
     connect(ui->pushButtonReplace, SIGNAL(clicked()), this, SLOT(pushButtonReplace()));
 
+    //QCoreApplication::setOrganizationDomain("Lineac");
+    //QCoreApplication::setApplicationName("TextEditor");
 
+    //permet d'utiliser des une QList<QString> dans mySettings
+    qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
+
+    initFileRecentMenu();
 
 
 }
@@ -136,6 +142,60 @@ bool MainWindow::fileNameAlreadyOpen(QString filename)
     }
     return response;
 }
+ // QSettings file::recents
+void MainWindow::initFileRecentMenu()
+{
+    qDebug() << "initFileRecentMenu";
+    QSettings mySettings("Lineac","TextEditor");
+    mySettings.setDefaultFormat(QSettings::NativeFormat);
+    QList<QString> recents = mySettings.value("recents").value<QList<QString>>();
+
+    for (QString filename:recents)
+    {
+        qDebug() << "initFileRecentMenu : " << filename;
+        addFileRecentToMenu(filename,true);
+    }
+}
+
+
+void MainWindow::addFileRecentToMenu(QString filename,bool force){
+    if (force || !isAlreadyInRecentSettings(filename))
+    {
+        QAction *myAction = new QAction(filename);
+        connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
+        ui->menuRecent->addAction(myAction);
+    }
+
+}
+
+void MainWindow::addFileRecentToSettings(QString filename){
+    QSettings mySettings("Lineac","TextEditor");
+    mySettings.setDefaultFormat(QSettings::NativeFormat);
+    if (!isAlreadyInRecentSettings(filename))
+    {
+        QList<QString> recents = mySettings.value("recents").value<QList<QString>>();
+        if (recents.count()>9) recents.removeFirst();
+        recents.append(filename);
+        mySettings.setValue("recents",QVariant::fromValue(recents));
+        ui->menuRecent->clear();
+        initFileRecentMenu();
+    }
+
+}
+
+bool MainWindow::isAlreadyInRecentSettings(QString filename)
+{
+    QSettings mySettings("Lineac","TextEditor");
+    mySettings.setDefaultFormat(QSettings::NativeFormat);
+    bool response = false;
+    QList<QString> recents = mySettings.value("recents").value<QList<QString>>();
+    for (QString f : recents)
+    {
+        if (f == filename) response = true;
+    }
+    return response;
+}
+
 
 //   SLOTS
 
@@ -172,9 +232,8 @@ int MainWindow::menuBarActionFileOpen()
         mPte->setInitialFileName(fileName);
         mPte->readFileContent();
         majCurrentTabCaption();
-        QAction *myAction = new QAction(fileName);
-        connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
-        ui->menuRecent->addAction(myAction);
+
+        addFileRecentToSettings(fileName);
     }
 
     return 0;
@@ -210,9 +269,8 @@ int MainWindow::menuBarActionFileSaveAs()
         getCurrentPlainTextEdit()->setInitialFileName(fileName);
         getCurrentPlainTextEdit()->saveAsToFile(fileName);
         majCurrentTabCaption();
-        QAction *myAction = new QAction(fileName);
-        connect(myAction, SIGNAL(triggered(bool)), this, SLOT(menuBarFileRecent()));
-        ui->menuRecent->addAction(myAction);
+
+        addFileRecentToSettings(fileName);
     }
     return 0;
 }

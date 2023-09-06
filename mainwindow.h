@@ -30,6 +30,7 @@ public:
     MainWindow(QWidget *parent = nullptr, QApplication *a = nullptr);
 
 
+
     ~MainWindow();
 
 
@@ -52,6 +53,14 @@ public:
     void majCurrentTabCaption();
 
     bool fileNameAlreadyOpen(QString filename);
+
+    void initFileRecentMenu();
+
+    void addFileRecentToMenu(QString filename,bool force=false);
+
+    void addFileRecentToSettings(QString filename);
+
+    bool isAlreadyInRecentSettings(QString filename);
 
 
 
@@ -79,6 +88,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QCoreApplication *application;
+
 
 
 
