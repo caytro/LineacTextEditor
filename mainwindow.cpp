@@ -142,17 +142,16 @@ bool MainWindow::fileNameAlreadyOpen(QString filename)
     }
     return response;
 }
+
  // QSettings file::recents
 void MainWindow::initFileRecentMenu()
 {
-    qDebug() << "initFileRecentMenu";
     QSettings mySettings("Lineac","TextEditor");
     mySettings.setDefaultFormat(QSettings::NativeFormat);
     QList<QString> recents = mySettings.value("recents").value<QList<QString>>();
 
     for (QString filename:recents)
     {
-        qDebug() << "initFileRecentMenu : " << filename;
         addFileRecentToMenu(filename,true);
     }
 }
