@@ -6,17 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>601</height>
+    <width>854</width>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Lin&amp;ac Text Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
@@ -91,17 +91,32 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <spacer name="spacerFind">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>106</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QCheckBox" name="checkBoxCaseSensitive">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>case sensitive</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxWholeWords">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Whole world</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QLabel" name="labelFind">
@@ -153,7 +168,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">Close</string>
+            <string notr="true"/>
            </property>
            <property name="icon">
             <iconset>
@@ -170,14 +185,14 @@
        <widget class="QFrame" name="frame">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>100</horstretch>
-          <verstretch>100</verstretch>
+          <horstretch>68</horstretch>
+          <verstretch>64</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>100</height>
+          <height>64</height>
          </size>
         </property>
         <property name="frameShape">
@@ -187,6 +202,21 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
@@ -219,8 +249,8 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>100</width>
-               <height>100</height>
+               <width>64</width>
+               <height>64</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -245,7 +275,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>897</width>
+     <width>854</width>
      <height>22</height>
     </rect>
    </property>

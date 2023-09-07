@@ -409,16 +409,27 @@ void MainWindow::pushButtonCloseFindBar()
 
 void MainWindow::pushButtonFindPrev()
 {
+    bool ci = ui->checkBoxCaseSensitive->isChecked();
+    bool ww = ui->checkBoxWholeWords->isChecked();
+
+    QTextDocument::FindFlags myFlags(QTextDocument::FindBackward);
+    if (ci) myFlags |= QTextDocument::FindCaseSensitively;
+    if (ww) myFlags |= QTextDocument::FindWholeWords;
     QString searchedText = ui->lineEditFind->text();
-    getCurrentPlainTextEdit()->find(searchedText,QTextDocument::FindBackward);
+    getCurrentPlainTextEdit()->find(searchedText,myFlags);
 }
 
 
 void MainWindow::pushButtonFindNext()
 {
-    QString searchedText = ui->lineEditFind->text();
+    bool ci = ui->checkBoxCaseSensitive->isChecked();
+    bool ww = ui->checkBoxWholeWords->isChecked();
 
-    getCurrentPlainTextEdit()->find(searchedText);
+    QTextDocument::FindFlags myFlags;
+    if (ci) myFlags |= QTextDocument::FindCaseSensitively;
+    if (ww) myFlags |= QTextDocument::FindWholeWords;
+    QString searchedText = ui->lineEditFind->text();
+    getCurrentPlainTextEdit()->find(searchedText,myFlags);
 }
 
 

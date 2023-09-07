@@ -11,7 +11,7 @@ This Qt C++ project provides a simple and robust text editor enabling multi tabs
 	File -> Quit
 	Cursor position
 	Multi Tabs management
-	Edit -> Find
+	Edit -> Find forward and backward including "case sensitive" and "whole word" options 
 	Edit -> Find and Replace
 	File -> Recent Files
 	
