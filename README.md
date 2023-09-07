@@ -9,13 +9,14 @@ This Qt C++ project provides a simple and robust text editor enabling multi tabs
 	File -> Save
 	File -> Save As
 	File -> Quit
-	
-### Comming soon
 	Cursor position
 	Multi Tabs management
 	Edit -> Find
 	Edit -> Find and Replace
 	File -> Recent Files
+	
+## Doc
+	Doxygen html documentation in /Doxygen
 	
 ## Compilation
 
